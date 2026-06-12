@@ -1,21 +1,40 @@
-import React from 'react';
-import { 
-  Search, 
-  Sparkles, 
-  Activity, 
-  Eye, 
-  Brain, 
-  Network, 
-  Zap, 
-  Bot, 
-  Database, 
+"use client";
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Search,
+  Sparkles,
+  Activity,
+  Eye,
+  Brain,
+  Network,
+  Zap,
+  Bot,
+  Database,
   Cpu,
-  Share2,
   FileText,
-  Map
+  Map,
 } from 'lucide-react';
 
 export default function LandingPage() {
+  const [topic, setTopic] = useState('');
+  const router = useRouter();
+
+  const handleGenerate = () => {
+    const trimmed = topic.trim();
+    if (!trimmed) return;
+    router.push(`/roadmap?topic=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleGenerate();
+  };
+
+  const handlePillClick = (pillTopic: string) => {
+    router.push(`/roadmap?topic=${encodeURIComponent(pillTopic)}`);
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0f1c] text-white selection:bg-cyan-500/30 overflow-hidden font-sans">
       {/* Background ambient glows */}
@@ -24,22 +43,6 @@ export default function LandingPage() {
         <div className="absolute top-[20%] right-[-10%] w-[30%] h-[40%] rounded-full bg-purple-500/10 blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] rounded-full bg-emerald-500/5 blur-[120px]" />
       </div>
-
-      {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="text-cyan-400">
-            <Share2 className="w-6 h-6" />
-          </div>
-          <span className="font-semibold text-lg tracking-tight">AI Research Mentor</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm text-slate-300 font-medium">
-          <a href="#" className="hover:text-white transition-colors">Home</a>
-          <a href="#" className="hover:text-white transition-colors">About</a>
-          <a href="#" className="hover:text-white transition-colors">Thin-font</a>
-          <a href="#" className="hover:text-white transition-colors">Contact</a>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32 flex flex-col items-center text-center">
@@ -70,12 +73,21 @@ export default function LandingPage() {
             <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
-                type="text" 
+                type="text"
+                id="topic-input"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Enter a topic (e.g., Kalman Filter, Computer Vision)"
                 className="w-full bg-transparent text-white placeholder-slate-500 pl-12 pr-4 py-3 outline-none rounded-xl focus:bg-white/5 transition-colors"
               />
             </div>
-            <button className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-medium flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+            <button
+              id="generate-roadmap-btn"
+              onClick={handleGenerate}
+              disabled={!topic.trim()}
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-medium flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+            >
               <Sparkles className="w-4 h-4" />
               Generate Roadmap
             </button>
@@ -86,14 +98,14 @@ export default function LandingPage() {
         <div className="w-full max-w-4xl">
           <h2 className="text-left text-lg font-semibold text-white mb-4 pl-2">Popular Topics</h2>
           <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-            <TopicPill icon={<Activity />} text="Kalman Filter" active />
-            <TopicPill icon={<Eye />} text="Computer Vision" />
-            <TopicPill icon={<Brain />} text="Machine Learning" />
-            <TopicPill icon={<Network />} text="Reinforcement Learning" />
-            <TopicPill icon={<Zap />} text="Signal Processing" />
-            <TopicPill icon={<Bot />} text="Robotics" />
-            <TopicPill icon={<Database />} text="Data Science" />
-            <TopicPill icon={<Cpu />} text="Deep Learning" />
+            <TopicPill icon={<Activity />} text="Kalman Filter" active onClick={handlePillClick} />
+            <TopicPill icon={<Eye />} text="Computer Vision" onClick={handlePillClick} />
+            <TopicPill icon={<Brain />} text="Machine Learning" onClick={handlePillClick} />
+            <TopicPill icon={<Network />} text="Reinforcement Learning" onClick={handlePillClick} />
+            <TopicPill icon={<Zap />} text="Signal Processing" onClick={handlePillClick} />
+            <TopicPill icon={<Bot />} text="Robotics" onClick={handlePillClick} />
+            <TopicPill icon={<Database />} text="Data Science" onClick={handlePillClick} />
+            <TopicPill icon={<Cpu />} text="Deep Learning" onClick={handlePillClick} />
           </div>
         </div>
       </main>
@@ -158,15 +170,25 @@ export default function LandingPage() {
 
 // Subcomponents
 
-function TopicPill({ icon, text, active = false }: { icon: React.ReactNode, text: string, active?: boolean }) {
+interface TopicPillProps {
+  icon: React.ReactNode;
+  text: string;
+  active?: boolean;
+  onClick: (topic: string) => void;
+}
+
+function TopicPill({ icon, text, active = false, onClick }: TopicPillProps) {
   return (
-    <button className={`
-      flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300
-      backdrop-blur-md border hover:scale-105 hover:-translate-y-0.5
-      ${active 
-        ? 'bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-cyan-400/50 text-white shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
-        : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/30 hover:text-white'}
-    `}>
+    <button
+      onClick={() => onClick(text)}
+      className={`
+        flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300
+        backdrop-blur-md border hover:scale-105 hover:-translate-y-0.5
+        ${active 
+          ? 'bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-cyan-400/50 text-white shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
+          : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/30 hover:text-white'}
+      `}
+    >
       <span className={`[&>svg]:w-4 [&>svg]:h-4 ${active ? 'text-cyan-400' : 'text-slate-400'}`}>
         {icon}
       </span>

@@ -1,6 +1,7 @@
 "use client";
 
-import { type FormEvent } from "react";
+import { type FormEvent, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AlertCircle, LoaderCircle, Sparkles, Waypoints } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,28 @@ import { useRoadmap } from "@/features/roadmap/hooks/use-roadmap";
 
 export function RoadmapPage() {
   const { topic, setTopic, isLoading, error, roadmap, generate } = useRoadmap();
+  const searchParams = useSearchParams();
+
+  // Effect 1: On mount, read the URL topic param and populate the input field.
+  useEffect(() => {
+    const urlTopic = searchParams.get("topic")?.trim();
+    if (urlTopic) {
+      setTopic(urlTopic);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Effect 2: Once topic state reflects the URL value, trigger generation.
+  // Guards ensure this only fires for the initial URL-driven load, not on every
+  // manual topic change made by the user after the page has loaded.
+  useEffect(() => {
+    const urlTopic = searchParams.get("topic")?.trim();
+    if (urlTopic && topic === urlTopic && !roadmap && !isLoading) {
+      generate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topic]);
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

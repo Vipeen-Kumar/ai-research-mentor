@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { Navbar } from "@/components/layout/navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,9 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <Navbar />
+        {/* pt-[73px] offsets the fixed navbar height (py-4 × 2 + ~1.25rem text = ~73px) */}
+        <div className="pt-[73px]">
+          {children}
+        </div>
       </body>
     </html>
   );
 }
-
