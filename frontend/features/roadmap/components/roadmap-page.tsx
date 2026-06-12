@@ -10,13 +10,16 @@ import { RoadmapGraph } from "@/features/roadmap/components/roadmap-graph";
 import { useRoadmap } from "@/features/roadmap/hooks/use-roadmap";
 
 export function RoadmapPage() {
-  const { topic, setTopic, isLoading, error, roadmap, generate } = useRoadmap();
+  const { topic, setTopic, isLoading, error, roadmap, generate, fetchRoadmap } = useRoadmap();
   const searchParams = useSearchParams();
 
-  // Effect 1: On mount, read the URL topic param and populate the input field.
+  // Effect 1: On mount, read the URL topic or ID param and populate state/fetch.
   useEffect(() => {
     const urlTopic = searchParams.get("topic")?.trim();
-    if (urlTopic) {
+    const urlId = searchParams.get("id")?.trim();
+    if (urlId) {
+      fetchRoadmap(urlId);
+    } else if (urlTopic) {
       setTopic(urlTopic);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -27,6 +30,9 @@ export function RoadmapPage() {
   // manual topic change made by the user after the page has loaded.
   useEffect(() => {
     const urlTopic = searchParams.get("topic")?.trim();
+    const urlId = searchParams.get("id")?.trim();
+    if (urlId) return; // Do NOT generate if we are loading an existing roadmap
+
     if (urlTopic && topic === urlTopic && !roadmap && !isLoading) {
       generate();
     }

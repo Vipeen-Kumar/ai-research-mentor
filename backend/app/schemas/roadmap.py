@@ -59,3 +59,24 @@ class RoadmapGenerateResponse(BaseModel):
             }
         ],
     }}}
+
+
+from datetime import datetime
+
+class RoadmapSummaryResponse(BaseModel):
+    id: str = Field(..., description="Unique roadmap identifier.")
+    topic: str = Field(..., description="Topic used for roadmap generation.")
+    created_at: datetime = Field(..., description="Timestamp of when the roadmap was created.")
+    node_count: int = Field(..., description="Number of milestones in the roadmap.")
+
+    model_config = {"from_attributes": True}
+
+
+class RoadmapDetailResponse(BaseModel):
+    id: str = Field(..., description="Unique roadmap identifier.")
+    topic: str = Field(..., description="Topic used for roadmap generation.")
+    nodes: list[RoadmapNodeResponse]
+    edges: list[RoadmapEdgeResponse]
+
+    model_config = {"from_attributes": True}
+

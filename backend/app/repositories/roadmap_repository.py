@@ -60,3 +60,12 @@ class RoadmapRepository:
         db.commit()
         db.refresh(roadmap)
         return roadmap
+
+    def get_all_roadmaps(self, db: Session) -> list[Roadmap]:
+        from sqlalchemy.orm import joinedload
+        return db.query(Roadmap).options(joinedload(Roadmap.nodes)).order_by(Roadmap.created_at.desc()).all()
+
+    def get_roadmap_by_id(self, db: Session, roadmap_id: str) -> Roadmap | None:
+        from sqlalchemy.orm import joinedload
+        return db.query(Roadmap).options(joinedload(Roadmap.nodes)).filter(Roadmap.id == roadmap_id).first()
+

@@ -6,7 +6,7 @@ import { Share2 } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Home",     href: "/" },
-  { label: "Roadmaps", href: "/roadmap" },
+  { label: "Roadmaps", href: "/roadmaps" },
   { label: "About",    href: "/about" },
   { label: "Contact",  href: "/contact" },
 ] as const;

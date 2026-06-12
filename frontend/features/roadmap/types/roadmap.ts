@@ -43,3 +43,20 @@ export interface RoadmapViewModel {
   nodes: RoadmapGraphNode[];
   edges: RoadmapGraphEdge[];
 }
+
+export interface RoadmapSummary {
+  id: string;
+  topic: string;
+  created_at: string;
+  node_count: number;
+}
+
+export type RoadmapHistoryResponse = RoadmapSummary[];
+
+export interface RoadmapDetailResponse {
+  id: string;
+  topic: string;
+  nodes: RoadmapApiNode[];
+  edges: RoadmapApiEdge[];
+}
+
