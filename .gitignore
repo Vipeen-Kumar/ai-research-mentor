@@ -17,3 +17,5 @@ __pycache__
 .DS_Store
 backend/alembic/versions/*
 !backend/alembic/versions/.gitkeep
+# Development docs and notes
+development/

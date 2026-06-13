@@ -12,7 +12,10 @@ import {
 import { BookOpen, Zap, Trophy } from "lucide-react";
 
 import { CustomRoadmapNode } from "@/features/roadmap/components/custom-roadmap-node";
+import { LearningPanel } from "@/features/learning/components/learning-panel";
+import { getLearningContent } from "@/features/learning/data/learning-content";
 import type { RoadmapViewModel } from "@/features/roadmap/types/roadmap";
+import type { LearningContent } from "@/features/learning/types/learning";
 
 const nodeTypes = {
   roadmapNode: CustomRoadmapNode,
@@ -25,6 +28,9 @@ interface RoadmapGraphProps {
 function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
   const { fitView } = useReactFlow();
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [isLearningPanelOpen, setIsLearningPanelOpen] = useState(false);
+  const [learningContent, setLearningContent] = useState<LearningContent | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Calculate progress on mount and when nodes change
   useEffect(() => {
@@ -57,6 +63,33 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
     window.addEventListener("storage", updateProgressBar);
     return () => window.removeEventListener("storage", updateProgressBar);
   }, [roadmap.statistics.totalNodes]);
+
+  // Listen for node selection events
+  useEffect(() => {
+    const handleNodeSelected = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { nodeId, title, difficulty, estimatedDuration, description } = customEvent.detail;
+      
+      setSelectedNodeId(nodeId);
+      const content = getLearningContent(
+        nodeId,
+        title,
+        difficulty,
+        estimatedDuration,
+        description,
+      );
+      setLearningContent(content);
+      setIsLearningPanelOpen(true);
+    };
+
+    window.addEventListener("node-selected", handleNodeSelected);
+    return () => window.removeEventListener("node-selected", handleNodeSelected);
+  }, []);
+
+  const handleCloseLearningPanel = () => {
+    setIsLearningPanelOpen(false);
+    setSelectedNodeId(null);
+  };
 
   return (
     <div className="space-y-5">
@@ -168,7 +201,10 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
           fitView
           minZoom={0.3}
           maxZoom={2}
-          nodes={roadmap.nodes}
+          nodes={roadmap.nodes.map((node) => ({
+            ...node,
+            selected: node.id === selectedNodeId,
+          }))}
           edges={roadmap.edges}
           nodeTypes={nodeTypes}
           panOnDrag
@@ -199,10 +235,17 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
         </ReactFlow>
       </div>
 
+      {/* Learning Panel */}
+      <LearningPanel
+        isOpen={isLearningPanelOpen}
+        content={learningContent}
+        onClose={handleCloseLearningPanel}
+      />
+
       {/* Tips */}
       <div className="rounded-lg border border-slate-200 bg-gradient-to-r from-sky-50 to-emerald-50 p-4 transition-all duration-300 dark:border-slate-700/60 dark:from-sky-500/10 dark:to-emerald-500/10">
         <p className="text-sm text-slate-700 dark:text-slate-300">
-          💡 <span className="font-medium">Tip:</span> Click the checkmark on any node to mark topics as completed. Your progress is saved locally and synchronized across sessions.
+          💡 <span className="font-medium">Tip:</span> Click any node to explore its learning details. Click the checkmark to mark topics as completed. Your progress is saved locally.
         </p>
       </div>
     </div>

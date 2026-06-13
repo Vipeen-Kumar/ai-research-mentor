@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, useReactFlow } from "@xyflow/react";
 import { CheckCircle2, Clock } from "lucide-react";
 
 import type {
@@ -23,8 +23,10 @@ const difficultyColors: Record<Difficulty, string> = {
 
 export function CustomRoadmapNode({
   data,
+  selected,
 }: NodeProps<RoadmapGraphNode>) {
   const [isCompleted, setIsCompleted] = useState(false);
+  const { getNode, setCenter } = useReactFlow();
 
   // Load completion status on mount
   useEffect(() => {
@@ -45,9 +47,28 @@ export function CustomRoadmapNode({
     setIsCompleted(!isCompleted);
   }, [isCompleted, data]);
 
+  const handleNodeClick = useCallback(() => {
+    // Dispatch custom event that roadmap-graph will listen for
+    const event = new CustomEvent("node-selected", {
+      detail: {
+        nodeId: (data as any).nodeId,
+        title: data.title,
+        difficulty: data.difficulty,
+        estimatedDuration: data.studyTime,
+        description: data.description,
+      },
+    });
+    window.dispatchEvent(event);
+  }, [data]);
+
   return (
     <div
-      className={`relative w-[280px] rounded-[20px] border-2 transition-all duration-300 overflow-hidden shadow-2xl hover:-translate-y-2 hover:shadow-3xl ${
+      onClick={handleNodeClick}
+      className={`relative w-[280px] rounded-[20px] border-2 transition-all duration-300 overflow-hidden shadow-2xl cursor-pointer hover:-translate-y-2 hover:shadow-3xl ${
+        selected
+          ? "ring-4 ring-sky-400 dark:ring-sky-500 border-sky-400 dark:border-sky-500"
+          : ""
+      } ${
         isCompleted
           ? "border-emerald-400/60 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 dark:border-emerald-400/40 dark:from-emerald-500/10 dark:to-teal-500/10"
           : `border-slate-300/40 bg-gradient-to-br ${difficultyColors[data.difficulty]} dark:border-slate-700/60 dark:bg-slate-900/60 backdrop-blur-sm`
@@ -92,7 +113,10 @@ export function CustomRoadmapNode({
             <span className="font-medium">{data.studyTime} weeks</span>
           </div>
           <button
-            onClick={handleToggleComplete}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleComplete();
+            }}
             className={`p-1.5 rounded-lg transition-all duration-300 ${
               isCompleted
                 ? "bg-emerald-500/30 text-emerald-600 dark:text-emerald-300"
