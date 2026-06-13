@@ -53,10 +53,6 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
     }
   };
 
-  if (!isOpen && !isAnimating) {
-    return null;
-  }
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
@@ -100,15 +96,21 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
     }
   };
 
+  if (!isOpen && !isAnimating) {
+    return null;
+  }
+
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${
-          isAnimating && isOpen ? "opacity-30" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={handleBackdropClick}
-      />
+      {/* Backdrop - only render when animating/open */}
+      {(isAnimating || isOpen) && (
+        <div
+          className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${
+            isAnimating && isOpen ? "opacity-30" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={handleBackdropClick}
+        />
+      )}
 
       {/* Panel */}
       <div

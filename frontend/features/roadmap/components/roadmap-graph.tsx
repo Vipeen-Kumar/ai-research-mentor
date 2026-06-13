@@ -196,7 +196,7 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
       </div>
 
       {/* Graph Container */}
-      <div className="h-[720px] w-full overflow-hidden rounded-[20px] border-2 border-slate-200 bg-slate-50 transition-all duration-300 dark:border-slate-800/80 dark:bg-slate-900/80 shadow-lg">
+      <div className="h-[720px] w-full overflow-hidden rounded-[20px] relative z-0">
         <ReactFlow
           fitView
           minZoom={0.3}
@@ -211,21 +211,24 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
           panOnScroll
           zoomOnScroll
           zoomOnPinch
+          zoomOnDoubleClick
+          nodesDraggable={true}
+          elementsSelectable={true}
           colorMode="system"
           proOptions={{ hideAttribution: true }}
         >
-          <MiniMap
-            pannable
-            zoomable
-            className="!bottom-4 !left-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90"
-          />
-          <Controls
-            className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800"
-            showInteractive={true}
-          />
           <Background 
             gap={32} 
             color="#1e293b"
+          />
+          <Controls
+            className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800 relative z-20"
+            showInteractive={true}
+          />
+          <MiniMap
+            pannable
+            zoomable
+            className="!bottom-4 !left-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 relative z-20"
           />
         </ReactFlow>
       </div>

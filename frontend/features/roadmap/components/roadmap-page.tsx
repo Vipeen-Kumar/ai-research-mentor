@@ -158,7 +158,7 @@ export function RoadmapPage() {
           </div>
         ) : null}
 
-        <div className="rounded-[32px] border border-slate-200 bg-slate-50/50 p-4 backdrop-blur-md transition-all duration-300 dark:border-slate-800/60 dark:bg-slate-900/50 sm:p-5">
+        <div>
           {roadmap ? (
             <div className="space-y-5">
               <div className="flex flex-col gap-4 border-b border-slate-200 px-1 pb-4 transition-colors duration-300 dark:border-slate-800/80 sm:flex-row sm:items-end sm:justify-between">
