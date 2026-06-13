@@ -21,7 +21,8 @@ class TestGeminiProviderInitialization:
 
     def test_init_with_valid_api_key(self):
         """Should initialize successfully with valid API key."""
-        api_key = "AQ.Ab8RN6J9gOjRUlFUPUv-BojX2PdXK2pkyCEKM3n7JDVYAa5SSgN"
+        # Use a test API key format (not a real key)
+        api_key = "test_api_key_valid_format_at_least_20_chars_long"
         
         with patch("app.services.ai.gemini_provider.genai.configure"):
             provider = GeminiRoadmapProvider(api_key=api_key)
@@ -40,9 +41,9 @@ class TestGeminiProviderInitialization:
 
     def test_validate_api_key(self):
         """Should validate API key format."""
-        # Valid keys
+        # Valid keys (format check only, not real keys)
         assert GeminiRoadmapProvider.validate_api_key(
-            "AQ.Ab8RN6J9gOjRUlFUPUv-BojX2PdXK2pkyCEKM3n7JDVYAa5SSgN"
+            "test_key_valid_format_at_least_20_chars_long_xyz"
         )
 
         # Invalid keys
