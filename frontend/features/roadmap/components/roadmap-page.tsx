@@ -172,12 +172,15 @@ export function RoadmapPage() {
                     {roadmap.topic}
                   </h2>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-slate-600 transition-colors duration-300 dark:text-slate-300">
+                <div className="flex flex-col gap-2 text-sm text-slate-600 transition-colors duration-300 dark:text-slate-300 sm:flex-row sm:items-center sm:gap-3">
                   <div className="rounded-full border border-sky-500/20 bg-sky-500/10 px-4 py-2">
                     Topic: {roadmap.topic}
                   </div>
                   <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2">
                     Nodes: {roadmap.nodeCount}
+                  </div>
+                  <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2">
+                    ~{roadmap.statistics.totalDuration} weeks
                   </div>
                 </div>
               </div>

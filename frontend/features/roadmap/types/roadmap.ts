@@ -32,16 +32,28 @@ export interface RoadmapGraphNodeData extends Record<string, unknown> {
   title: string;
   description: string;
   difficulty: Difficulty;
+  studyTime: number; // in weeks
+  isCompleted: boolean;
 }
 
 export type RoadmapGraphNode = Node<RoadmapGraphNodeData, "roadmapNode">;
 export type RoadmapGraphEdge = Edge;
+
+export interface RoadmapStatistics {
+  totalNodes: number;
+  totalDuration: number; // in weeks
+  beginnerCount: number;
+  intermediateCount: number;
+  advancedCount: number;
+  completedCount: number;
+}
 
 export interface RoadmapViewModel {
   topic: string;
   nodeCount: number;
   nodes: RoadmapGraphNode[];
   edges: RoadmapGraphEdge[];
+  statistics: RoadmapStatistics;
 }
 
 export interface RoadmapSummary {
