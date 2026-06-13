@@ -16,9 +16,9 @@ const difficultyClasses: Record<Difficulty, string> = {
 };
 
 const difficultyColors: Record<Difficulty, string> = {
-  Beginner: "from-emerald-500/40 to-teal-500/40",
-  Intermediate: "from-amber-500/40 to-orange-500/40",
-  Advanced: "from-rose-500/40 to-red-500/40",
+  Beginner: "from-emerald-500/10 to-teal-500/10",
+  Intermediate: "from-amber-500/10 to-orange-500/10",
+  Advanced: "from-rose-500/10 to-red-500/10",
 };
 
 export function CustomRoadmapNode({
@@ -64,14 +64,14 @@ export function CustomRoadmapNode({
   return (
     <div
       onClick={handleNodeClick}
-      className={`relative w-[280px] rounded-[20px] border-2 transition-all duration-300 overflow-hidden shadow-2xl cursor-pointer hover:-translate-y-2 hover:shadow-3xl ${
+      className={`relative w-[280px] rounded-[20px] border-2 transition-all duration-300 overflow-hidden shadow-lg cursor-pointer hover:-translate-y-2 hover:shadow-xl ${
         selected
           ? "ring-4 ring-sky-400 dark:ring-sky-500 border-sky-400 dark:border-sky-500"
           : ""
       } ${
         isCompleted
           ? "border-emerald-400/60 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 dark:border-emerald-400/40 dark:from-emerald-500/10 dark:to-teal-500/10"
-          : `border-slate-300/40 bg-gradient-to-br ${difficultyColors[data.difficulty]} dark:border-slate-700/60 dark:bg-slate-900/60 backdrop-blur-sm`
+          : `border-slate-300/40 bg-gradient-to-br ${difficultyColors[data.difficulty]} dark:border-slate-700/60 dark:bg-slate-900/60`
       }`}
     >
       {/* Animated background gradient */}

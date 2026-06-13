@@ -196,7 +196,7 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
       </div>
 
       {/* Graph Container */}
-      <div className="h-[720px] w-full overflow-hidden rounded-[20px] border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 transition-all duration-300 dark:border-slate-800/80 dark:from-slate-950 dark:to-slate-900 shadow-2xl">
+      <div className="h-[720px] w-full overflow-hidden rounded-[20px] border-2 border-slate-200 bg-slate-50 transition-all duration-300 dark:border-slate-800/80 dark:bg-slate-900/80 shadow-lg">
         <ReactFlow
           fitView
           minZoom={0.3}
@@ -217,20 +217,15 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
           <MiniMap
             pannable
             zoomable
-            className="!bottom-4 !left-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 backdrop-blur-sm"
+            className="!bottom-4 !left-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90"
           />
           <Controls
-            className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white backdrop-blur-sm shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800"
+            className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800"
             showInteractive={true}
           />
           <Background 
             gap={32} 
-            color="#e2e8f0"
-            className="dark:!bg-slate-950"
-            style={{
-              backgroundImage: "radial-gradient(circle, #e2e8f0 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
-            }}
+            color="#1e293b"
           />
         </ReactFlow>
       </div>

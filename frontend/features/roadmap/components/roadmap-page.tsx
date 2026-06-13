@@ -48,8 +48,6 @@ export function RoadmapPage() {
   return (
     <section className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white/80 px-6 py-8 shadow-xl backdrop-blur-xl transition-all duration-300 dark:border-slate-800/80 dark:bg-slate-950/70 sm:px-8 lg:px-12 lg:py-12">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]" />
-      <div className="absolute -left-16 top-24 h-40 w-40 rounded-full bg-emerald-400/20 blur-3xl transition-opacity duration-300 dark:bg-emerald-400/10" />
-      <div className="absolute right-0 top-8 h-56 w-56 rounded-full bg-sky-400/20 blur-3xl transition-opacity duration-300 dark:bg-sky-400/10" />
 
       <div className="relative space-y-8">
         <div className="space-y-5">
