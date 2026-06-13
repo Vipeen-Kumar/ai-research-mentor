@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   Background,
   Controls,
-  MiniMap,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
@@ -225,11 +224,6 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
             className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800 relative z-20"
             showInteractive={true}
           />
-          <MiniMap
-            pannable
-            zoomable
-            className="!bottom-4 !left-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 relative z-20"
-          />
         </ReactFlow>
       </div>
 
@@ -239,13 +233,6 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
         content={learningContent}
         onClose={handleCloseLearningPanel}
       />
-
-      {/* Tips */}
-      <div className="rounded-lg border border-slate-200 bg-gradient-to-r from-sky-50 to-emerald-50 p-4 transition-all duration-300 dark:border-slate-700/60 dark:from-sky-500/10 dark:to-emerald-500/10">
-        <p className="text-sm text-slate-700 dark:text-slate-300">
-          💡 <span className="font-medium">Tip:</span> Click any node to explore its learning details. Click the checkmark to mark topics as completed. Your progress is saved locally.
-        </p>
-      </div>
     </div>
   );
 }
