@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     )
     docs_enabled: bool = Field(default=True, alias="DOCS_ENABLED")
     ai_provider: str = Field(default="mock", alias="AI_PROVIDER")
+    gemini_api_key: str | None = Field(default=None, alias="GEMINI_API_KEY")
 
     model_config = SettingsConfigDict(
         env_file=".env",

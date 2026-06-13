@@ -22,7 +22,12 @@ def get_roadmap_repository() -> RoadmapRepository:
 
 def get_ai_provider() -> BaseRoadmapProvider:
     if settings.ai_provider.lower() == "gemini":
-        return GeminiRoadmapProvider()
+        if not settings.gemini_api_key:
+            raise ValueError(
+                "GEMINI_API_KEY environment variable is not set. "
+                "Set it in .env or disable Gemini by setting AI_PROVIDER=mock"
+            )
+        return GeminiRoadmapProvider(api_key=settings.gemini_api_key)
 
     return MockRoadmapProvider()
 
