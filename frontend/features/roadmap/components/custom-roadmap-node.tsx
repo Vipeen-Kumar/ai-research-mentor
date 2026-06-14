@@ -52,10 +52,6 @@ export function CustomRoadmapNode({
     const event = new CustomEvent("node-selected", {
       detail: {
         nodeId: (data as any).nodeId,
-        title: data.title,
-        difficulty: data.difficulty,
-        estimatedDuration: data.studyTime,
-        description: data.description,
       },
     });
     window.dispatchEvent(event);

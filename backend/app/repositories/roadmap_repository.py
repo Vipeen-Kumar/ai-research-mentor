@@ -51,6 +51,7 @@ class RoadmapRepository:
                 parent_node_id=previous_node_id,
                 title=generated_node.title,
                 description=generated_node.description,
+                subtopics=generated_node.subtopics,
                 sort_order=index,
             )
             db.add(roadmap_node)

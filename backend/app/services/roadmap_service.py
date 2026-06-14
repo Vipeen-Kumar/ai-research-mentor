@@ -46,6 +46,7 @@ class RoadmapService:
                 id=node.id,
                 title=node.title,
                 description=node.description,
+                subtopics=node.subtopics,
                 order=node.sort_order,
             )
             for node in ordered_nodes
@@ -92,6 +93,7 @@ class RoadmapService:
                 id=node.id,
                 title=node.title,
                 description=node.description,
+                subtopics=node.subtopics,
                 order=node.sort_order,
             )
             for node in ordered_nodes

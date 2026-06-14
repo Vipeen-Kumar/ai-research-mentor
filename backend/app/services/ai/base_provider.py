@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class GeneratedRoadmapNode:
     title: str
     description: str
+    subtopics: list[str]
 
 
 @dataclass(slots=True)

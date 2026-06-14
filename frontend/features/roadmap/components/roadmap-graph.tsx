@@ -12,9 +12,7 @@ import { BookOpen, Zap, Trophy } from "lucide-react";
 
 import { CustomRoadmapNode } from "@/features/roadmap/components/custom-roadmap-node";
 import { LearningPanel } from "@/features/learning/components/learning-panel";
-import { getLearningContent } from "@/features/learning/data/learning-content";
-import type { RoadmapViewModel } from "@/features/roadmap/types/roadmap";
-import type { LearningContent } from "@/features/learning/types/learning";
+import type { RoadmapViewModel, RoadmapGraphNodeData } from "@/features/roadmap/types/roadmap";
 
 const nodeTypes = {
   roadmapNode: CustomRoadmapNode,
@@ -28,7 +26,7 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
   const { fitView } = useReactFlow();
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [isLearningPanelOpen, setIsLearningPanelOpen] = useState(false);
-  const [learningContent, setLearningContent] = useState<LearningContent | null>(null);
+  const [learningContent, setLearningContent] = useState<RoadmapGraphNodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Calculate progress on mount and when nodes change
@@ -67,23 +65,20 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
   useEffect(() => {
     const handleNodeSelected = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { nodeId, title, difficulty, estimatedDuration, description } = customEvent.detail;
+      const { nodeId } = customEvent.detail;
       
       setSelectedNodeId(nodeId);
-      const content = getLearningContent(
-        nodeId,
-        title,
-        difficulty,
-        estimatedDuration,
-        description,
-      );
-      setLearningContent(content);
-      setIsLearningPanelOpen(true);
+      
+      const node = roadmap.nodes.find((n) => n.id === nodeId);
+      if (node) {
+        setLearningContent(node.data);
+        setIsLearningPanelOpen(true);
+      }
     };
 
     window.addEventListener("node-selected", handleNodeSelected);
     return () => window.removeEventListener("node-selected", handleNodeSelected);
-  }, []);
+  }, [roadmap.nodes]);
 
   const handleCloseLearningPanel = () => {
     setIsLearningPanelOpen(false);

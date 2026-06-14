@@ -109,6 +109,7 @@ function buildGraphNode(
       nodeId: node.id,
       title: node.title,
       description: node.description,
+      subtopics: node.subtopics || [],
       difficulty: getDifficulty(index, totalNodes),
       studyTime: estimateStudyTime(getDifficulty(index, totalNodes)),
       isCompleted: completedNodes[node.id] || false,

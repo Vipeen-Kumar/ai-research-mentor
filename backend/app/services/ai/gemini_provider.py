@@ -242,7 +242,13 @@ Return ONLY a valid JSON object (no markdown, no explanation, no code fences) wi
       "title": "node title",
       "difficulty": "Beginner|Intermediate|Advanced",
       "description": "what students will learn (1-2 sentences)",
-      "duration": "X weeks"
+      "duration": "X weeks",
+      "subtopics": [
+        "subtopic 1",
+        "subtopic 2",
+        "subtopic 3",
+        "subtopic 4"
+      ]
     }}
   ]
 }}
@@ -254,8 +260,9 @@ Important requirements:
 4. Duration should be realistic (1-4 weeks per node)
 5. Descriptions should be concise and focused on "{topic}"
 6. Each node title should be specific to "{topic}"
-7. Nodes should form a logical learning progression
-8. All content must be relevant to "{topic}"
+7. Each node must contain 4-8 meaningful subtopics
+8. Nodes should form a logical learning progression
+9. All content must be relevant to "{topic}"
 
 Generate the roadmap now."""
 
@@ -417,9 +424,17 @@ Generate the roadmap now."""
         if len(description) > 500:
             logger.warning(f"Node {index}: description truncated to 500 chars")
             description = description[:500]
+            
+        subtopics = node_data.get("subtopics", [])
+        if not isinstance(subtopics, list):
+            subtopics = []
+        subtopics = [str(s).strip() for s in subtopics if str(s).strip()]
+        
+        if not subtopics:
+            subtopics = ["Introduction", "Core Concepts", "Applications"]
 
-        logger.warning(f"Node {index} validated: '{title}'")
-        return GeneratedRoadmapNode(title=title, description=description)
+        logger.warning(f"Node {index} validated: '{title}' with {len(subtopics)} subtopics")
+        return GeneratedRoadmapNode(title=title, description=description, subtopics=subtopics)
 
     @staticmethod
     def validate_api_key(api_key: Optional[str]) -> bool:

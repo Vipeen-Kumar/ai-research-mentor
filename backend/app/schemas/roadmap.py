@@ -15,6 +15,7 @@ class RoadmapNodeResponse(BaseModel):
     id: str = Field(..., description="Unique roadmap node identifier.")
     title: str = Field(..., description="Roadmap milestone title.")
     description: str = Field(..., description="Short explanation of why the milestone matters.")
+    subtopics: list[str] = Field(..., description="Key subtopics for the milestone.")
     order: int = Field(..., description="Sequential order of the learning step.")
 
 
@@ -42,12 +43,14 @@ class RoadmapGenerateResponse(BaseModel):
                 "id": "fb6efad3-bebe-460d-ab93-d4c63994cb95",
                 "title": "Linear Algebra",
                 "description": "Review vectors, matrices, eigenvalues, and linear transformations.",
+                "subtopics": ["Vectors", "Matrices", "Eigenvalues"],
                 "order": 1,
             },
             {
                 "id": "6a1b6620-8610-4169-973e-f97e957269b8",
                 "title": "Probability",
                 "description": "Understand random variables, Gaussian distributions, and covariance.",
+                "subtopics": ["Random variables", "Gaussian distributions", "Covariance"],
                 "order": 2,
             },
         ],

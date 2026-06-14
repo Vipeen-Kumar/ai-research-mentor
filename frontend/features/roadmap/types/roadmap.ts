@@ -8,6 +8,7 @@ export interface RoadmapApiNode {
   id: string;
   title: string;
   description: string;
+  subtopics: string[];
   order: number;
 }
 
@@ -31,6 +32,7 @@ export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 export interface RoadmapGraphNodeData extends Record<string, unknown> {
   title: string;
   description: string;
+  subtopics: string[];
   difficulty: Difficulty;
   studyTime: number; // in weeks
   isCompleted: boolean;

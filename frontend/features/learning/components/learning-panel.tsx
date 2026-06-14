@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BookOpen, ChevronRight, ExternalLink, X } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 
-import type { LearningContent } from "@/features/learning/types/learning";
+import type { RoadmapGraphNodeData } from "@/features/roadmap/types/roadmap";
 
 interface LearningPanelProps {
   isOpen: boolean;
-  content: LearningContent | null;
+  content: RoadmapGraphNodeData | null;
   onClose: () => void;
 }
 
@@ -53,19 +53,6 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Beginner":
-        return "from-emerald-500/20 to-teal-500/20 border-emerald-500/30";
-      case "Intermediate":
-        return "from-amber-500/20 to-orange-500/20 border-amber-500/30";
-      case "Advanced":
-        return "from-rose-500/20 to-red-500/20 border-rose-500/30";
-      default:
-        return "from-slate-500/20 to-slate-500/20 border-slate-500/30";
-    }
-  };
-
   const getDifficultyBadgeColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
@@ -79,20 +66,16 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
     }
   };
 
-  const getResourceIcon = (type: string) => {
-    switch (type) {
-      case "book":
-        return "📚";
-      case "article":
-        return "📰";
-      case "video":
-        return "🎥";
-      case "course":
-        return "🎓";
-      case "paper":
-        return "📄";
+  const getDifficultyBulletColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "Beginner":
+        return "bg-emerald-500";
+      case "Intermediate":
+        return "bg-amber-500";
+      case "Advanced":
+        return "bg-rose-500";
       default:
-        return "🔗";
+        return "bg-slate-500";
     }
   };
 
@@ -155,7 +138,7 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
                     {content.title}
                   </h2>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                    ⏱️ Estimated {content.estimatedDuration} weeks
+                    ⏱️ Estimated {content.studyTime} weeks
                   </p>
                 </div>
                 <button
@@ -178,105 +161,26 @@ export function LearningPanel({ isOpen, content, onClose }: LearningPanelProps) 
                   </p>
                 </div>
 
-                {/* Why This Matters */}
+                {/* Key Subtopics */}
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-                    Why This Matters
-                  </h3>
-                  <div
-                    className={`rounded-lg border-2 bg-gradient-to-br ${getDifficultyColor(
-                      content.difficulty,
-                    )} p-4`}
-                  >
-                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                      {content.whyMatters}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Key Concepts */}
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-                    Key Concepts
+                    Key Subtopics
                   </h3>
                   <div className="space-y-3">
-                    {content.keyConcepts.map((concept, idx) => (
+                    {content.subtopics?.map((subtopic, idx) => (
                       <div
                         key={idx}
-                        className="rounded-lg border border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/50 p-4 hover:shadow-md transition-shadow"
+                        className="rounded-lg border border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/50 p-4 hover:shadow-md transition-shadow flex items-center gap-3"
                       >
-                        <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-1">
-                          {concept.title}
+                        <div className={`w-2 h-2 flex-shrink-0 rounded-full ${getDifficultyBulletColor(content.difficulty)}`} />
+                        <h4 className="font-medium text-slate-900 dark:text-white text-sm">
+                          {subtopic}
                         </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                          {concept.description}
-                        </p>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                {/* Recommended Resources */}
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-                    Recommended Resources
-                  </h3>
-                  <div className="space-y-2">
-                    {content.recommendedResources.map((resource, idx) => (
-                      <a
-                        key={idx}
-                        href={resource.url || "#"}
-                        className="flex items-start gap-3 rounded-lg border border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/50 p-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group"
-                        target={resource.url ? "_blank" : undefined}
-                        rel={resource.url ? "noopener noreferrer" : undefined}
-                      >
-                        <span className="text-lg flex-shrink-0 mt-0.5">
-                          {getResourceIcon(resource.type)}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
-                            {resource.title}
-                          </p>
-                          {resource.author && (
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                              by {resource.author}
-                            </p>
-                          )}
-                        </div>
-                        {resource.url && (
-                          <ExternalLink className="h-4 w-4 flex-shrink-0 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors mt-0.5" />
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Related Topics */}
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-                    Related Topics
-                  </h3>
-                  <div className="space-y-2">
-                    {content.relatedTopics.map((topic, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/50 p-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
-                            {topic.title}
-                          </p>
-                          <span
-                            className={`inline-block text-xs font-bold mt-1 px-2 py-0.5 rounded-full border ${getDifficultyBadgeColor(
-                              topic.difficulty,
-                            )}`}
-                          >
-                            {topic.difficulty}
-                          </span>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors flex-shrink-0 ml-2" />
-                      </div>
-                    ))}
+                    {(!content.subtopics || content.subtopics.length === 0) && (
+                      <p className="text-sm text-slate-500 italic">No subtopics available.</p>
+                    )}
                   </div>
                 </div>
 

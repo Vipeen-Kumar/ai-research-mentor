@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +22,7 @@ class RoadmapNode(TimestampedUUIDModel):
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
+    subtopics: Mapped[list[str]] = mapped_column(JSON, nullable=False, server_default='[]')
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False)
 
     roadmap = relationship("Roadmap", back_populates="nodes")
