@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -23,11 +23,13 @@ interface RoadmapGraphProps {
 }
 
 function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
-  const { fitView } = useReactFlow();
+  const { fitView, flowToScreenPosition } = useReactFlow();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [isLearningPanelOpen, setIsLearningPanelOpen] = useState(false);
   const [learningContent, setLearningContent] = useState<RoadmapGraphNodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [panelPosition, setPanelPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Calculate progress on mount and when nodes change
   useEffect(() => {
@@ -66,23 +68,52 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
     const handleNodeSelected = (event: Event) => {
       const customEvent = event as CustomEvent;
       const { nodeId } = customEvent.detail;
-      
+
       setSelectedNodeId(nodeId);
-      
+
       const node = roadmap.nodes.find((n) => n.id === nodeId);
-      if (node) {
+      if (node && containerRef.current) {
         setLearningContent(node.data);
         setIsLearningPanelOpen(true);
+
+        // Compute panel position relative to graph container
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const screenPos = flowToScreenPosition({
+          x: node.position.x,
+          y: node.position.y,
+        });
+
+        const relX = screenPos.x - containerRect.left;
+        const relY = screenPos.y - containerRect.top;
+
+        const panelWidth = 340;
+        const nodeWidth = 280;
+        const panelHeight = 500;
+        const margin = 12;
+
+        // Prefer right side; fall back to left if not enough space
+        let panelX =
+          relX + nodeWidth + margin + panelWidth > containerRect.width
+            ? relX - panelWidth - margin
+            : relX + nodeWidth + margin;
+        panelX = Math.max(margin, Math.min(panelX, containerRect.width - panelWidth - margin));
+
+        // Center vertically with the node; clamp to container
+        let panelY = relY - panelHeight / 2;
+        panelY = Math.max(margin, Math.min(panelY, containerRect.height - panelHeight - margin));
+
+        setPanelPosition({ x: panelX, y: panelY });
       }
     };
 
     window.addEventListener("node-selected", handleNodeSelected);
     return () => window.removeEventListener("node-selected", handleNodeSelected);
-  }, [roadmap.nodes]);
+  }, [roadmap.nodes, flowToScreenPosition]);
 
   const handleCloseLearningPanel = () => {
     setIsLearningPanelOpen(false);
     setSelectedNodeId(null);
+    setPanelPosition(null);
   };
 
   return (
@@ -190,7 +221,7 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
       </div>
 
       {/* Graph Container */}
-      <div className="h-[720px] w-full overflow-hidden rounded-[20px] relative z-0">
+      <div ref={containerRef} className="h-[720px] w-full overflow-hidden rounded-[20px] relative z-0">
         <ReactFlow
           fitView
           minZoom={0.3}
@@ -211,23 +242,25 @@ function RoadmapGraphContent({ roadmap }: RoadmapGraphProps) {
           colorMode="system"
           proOptions={{ hideAttribution: true }}
         >
-          <Background 
-            gap={32} 
+          <Background
+            gap={32}
             color="#1e293b"
           />
           <Controls
-            className="!right-4 !top-4 !rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800 relative z-20"
+            position="top-left"
+            className="!rounded-xl !border-2 !border-slate-300 !bg-white/90 dark:!border-slate-700 dark:!bg-slate-900/90 dark:!text-white shadow-lg [&_button]:transition-all [&_button]:duration-300 [&_button]:hover:bg-slate-100 dark:[&_button]:hover:bg-slate-800"
             showInteractive={true}
           />
         </ReactFlow>
-      </div>
 
-      {/* Learning Panel */}
-      <LearningPanel
-        isOpen={isLearningPanelOpen}
-        content={learningContent}
-        onClose={handleCloseLearningPanel}
-      />
+        {/* Learning Panel — floats inside the graph near the selected node */}
+        <LearningPanel
+          isOpen={isLearningPanelOpen}
+          content={learningContent}
+          onClose={handleCloseLearningPanel}
+          anchorPosition={panelPosition}
+        />
+      </div>
     </div>
   );
 }
