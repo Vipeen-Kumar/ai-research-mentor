@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Sparkles, Mail, MessageSquare, Github } from "lucide-react";
+import { Sparkles, MessageSquare, Github } from "lucide-react";
+import { ContactForm } from "./contact-form";
 
 export const metadata = {
   title: "Contact | AI Research Mentor",
@@ -30,15 +31,8 @@ export default function ContactPage() {
 
       {/* Contact Cards */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 py-12">
-        <div className="grid sm:grid-cols-2 gap-6">
-          <ContactCard
-            icon={<Mail className="w-6 h-6 text-cyan-400" />}
-            title="Email"
-            detail="vipeenk023@gmail.com"
-            description="Send us a message and we'll get back to you within 48 hours."
-            href="mailto:vipeenk023@gmail.com"
-            linkLabel="Send an email"
-          />
+        <div className="grid md:grid-cols-2 gap-6">
+          <ContactForm />
           <ContactCard
             icon={<Github className="w-6 h-6 text-purple-400" />}
             title="GitHub"
@@ -81,7 +75,7 @@ function ContactCard({
   linkLabel: string;
 }) {
   return (
-    <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors group">
+    <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors group h-full">
       <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
         {icon}
       </div>
