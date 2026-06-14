@@ -45,6 +45,63 @@ def debug_get_provider(
     }
 
 
+@router.get(
+    "/debug/gemini",
+    status_code=status.HTTP_200_OK,
+    summary="Debug: Test Gemini API directly",
+    description="Calls Gemini API directly and returns raw response. Tests new SDK.",
+)
+def debug_gemini_test(
+    provider: BaseRoadmapProvider = Depends(get_ai_provider),
+) -> dict:
+    """Debug endpoint to test Gemini integration directly."""
+    logger.warning("=" * 60)
+    logger.warning("/debug/gemini endpoint called")
+    logger.warning("=" * 60)
+    
+    # Check if provider is Gemini
+    if provider.__class__.__name__ != "GeminiRoadmapProvider":
+        logger.error(f"Provider is {provider.__class__.__name__}, not GeminiRoadmapProvider")
+        return {
+            "status": "error",
+            "message": f"Expected GeminiRoadmapProvider, got {provider.__class__.__name__}",
+            "provider_class": provider.__class__.__name__,
+        }
+    
+    try:
+        logger.warning("Testing Gemini health check...")
+        health = provider.health_check()
+        logger.warning(f"Health check result: {health}")
+        
+        # Try to generate a simple roadmap
+        logger.warning("Testing Gemini with simple topic: 'Python Basics'")
+        test_roadmap = provider.generate_roadmap("Python Basics")
+        logger.warning(f"Generated roadmap: {test_roadmap.topic}")
+        logger.warning(f"Nodes: {[n.title for n in test_roadmap.nodes]}")
+        
+        return {
+            "status": "success",
+            "message": "Gemini integration working",
+            "model": provider.MODEL_NAME,
+            "health_check": health,
+            "test_roadmap": {
+                "topic": test_roadmap.topic,
+                "summary": test_roadmap.summary,
+                "node_count": len(test_roadmap.nodes),
+                "node_titles": [n.title for n in test_roadmap.nodes],
+            }
+        }
+        
+    except Exception as e:
+        logger.exception(f"Gemini test failed: {e}")
+        return {
+            "status": "error",
+            "message": f"Gemini test failed: {type(e).__name__}: {e}",
+            "model": provider.MODEL_NAME,
+            "error_details": str(e),
+        }
+
+
 @router.post(
     "/generate",
     response_model=RoadmapGenerateResponse,
