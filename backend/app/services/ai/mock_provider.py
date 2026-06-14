@@ -1,5 +1,7 @@
+import logging
 from app.services.ai.base_provider import BaseRoadmapProvider, GeneratedRoadmap, GeneratedRoadmapNode
 
+logger = logging.getLogger(__name__)
 
 ROADMAP_LIBRARY: dict[str, GeneratedRoadmap] = {
     "kalman filter": GeneratedRoadmap(
@@ -87,11 +89,14 @@ class MockRoadmapProvider(BaseRoadmapProvider):
     provider_name = "mock"
 
     def generate_roadmap(self, topic: str) -> GeneratedRoadmap:
+        logger.warning(f"USING MOCK PROVIDER for topic: {topic}")
         normalized = topic.strip().lower()
         if normalized in ROADMAP_LIBRARY:
             roadmap = ROADMAP_LIBRARY[normalized]
+            logger.debug(f"Found mock roadmap in library for: {normalized}")
             return GeneratedRoadmap(topic=topic.strip(), summary=roadmap.summary, nodes=roadmap.nodes)
 
+        logger.debug(f"No mock roadmap found in library for: {normalized}. Generating default roadmap.")
         return GeneratedRoadmap(
             topic=topic.strip(),
             summary=f"A structured foundation-to-application roadmap for {topic.strip()}.",

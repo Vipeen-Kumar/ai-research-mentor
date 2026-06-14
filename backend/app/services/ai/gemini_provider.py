@@ -47,8 +47,8 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
     """
 
     provider_name = "gemini"
-    # Use gemini-1.5-flash which is available in google-generativeai 0.8.3
-    MODEL_NAME = "gemini-1.5-flash"
+    # Use gemini-2.0-flash which is available (gemini-1.5-flash is deprecated)
+    MODEL_NAME = "gemini-2.0-flash"
 
     def __init__(self, api_key: str):
         """
@@ -60,21 +60,24 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
         Raises:
             ValueError: If API key is missing or invalid
         """
+        logger.warning("=== GeminiRoadmapProvider.__init__() called ===")
+        logger.warning(f"USING GEMINI PROVIDER with API key starting: {api_key[:20]}")
+        
         if not api_key:
             raise ValueError("GEMINI_API_KEY environment variable is not set")
 
-        logger.info("Initializing GeminiRoadmapProvider")
-        logger.debug(f"API key present: {bool(api_key)}")
+        logger.warning("Initializing GeminiRoadmapProvider")
+        logger.warning(f"API key present: {bool(api_key)}, length: {len(api_key)}")
         
         self.api_key = api_key
         self.fallback_provider = MockRoadmapProvider()
 
         try:
             # Configure Gemini API
-            logger.debug(f"Configuring Gemini with model: {self.MODEL_NAME}")
+            logger.warning(f"Configuring Gemini with model: {self.MODEL_NAME}")
             genai.configure(api_key=api_key)
             self.model = genai.GenerativeModel(self.MODEL_NAME)
-            logger.info(f"GeminiRoadmapProvider initialized successfully with model {self.MODEL_NAME}")
+            logger.warning(f"✓ GeminiRoadmapProvider initialized successfully with model {self.MODEL_NAME}")
         except InvalidArgument as e:
             logger.error(f"Invalid model name: {self.MODEL_NAME}. Error: {e}")
             raise ValueError(f"Model '{self.MODEL_NAME}' is not available. Please check SDK version.") from e
@@ -103,22 +106,27 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
         start_time = time.time()
         attempt = 1
         
+        logger.warning(f"=== generate_roadmap() called for topic: {topic} ===")
+        logger.warning(f"USING GEMINI PROVIDER for topic: {topic}")
+        
         try:
-            logger.info(f"Starting roadmap generation for topic: '{topic}'")
+            logger.warning(f"Starting roadmap generation for topic: '{topic}'")
             
             # Try Gemini first
-            logger.info(f"Attempt {attempt}: Trying Gemini API")
+            logger.warning(f"Attempt {attempt}: Trying Gemini API")
             try:
                 roadmap = self._generate_with_gemini(topic)
                 elapsed = time.time() - start_time
-                logger.info(f"Successfully generated roadmap using Gemini in {elapsed:.2f}s")
+                logger.warning(f"✓ Successfully generated roadmap using Gemini in {elapsed:.2f}s")
                 return roadmap
             except (TimeoutError, DeadlineExceeded) as timeout_error:
                 elapsed = time.time() - start_time
                 logger.warning(f"Gemini API timeout (attempt {attempt}) after {elapsed:.2f}s: {timeout_error}")
+                logger.exception("Timeout exception details:")
             except Exception as e:
                 elapsed = time.time() - start_time
                 logger.warning(f"Gemini generation failed (attempt {attempt}) after {elapsed:.2f}s: {e}")
+                logger.exception("Exception details for first attempt:")
 
             # Check if we have time for retry
             elapsed = time.time() - start_time
@@ -128,21 +136,25 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
 
             # Retry once with delay
             attempt = 2
-            logger.info(f"Waiting {RETRY_DELAY_SECONDS}s before retry attempt {attempt}")
+            logger.warning(f"Waiting {RETRY_DELAY_SECONDS}s before retry attempt {attempt}")
             time.sleep(RETRY_DELAY_SECONDS)
             
-            logger.info(f"Attempt {attempt}: Retrying Gemini API")
+            logger.warning(f"Attempt {attempt}: Retrying Gemini API")
             try:
                 roadmap = self._generate_with_gemini(topic)
                 elapsed = time.time() - start_time
-                logger.info(f"Successfully generated roadmap using Gemini (retry) in {elapsed:.2f}s")
+                logger.warning(f"✓ Successfully generated roadmap using Gemini (retry) in {elapsed:.2f}s")
                 return roadmap
             except (TimeoutError, DeadlineExceeded) as timeout_error:
                 elapsed = time.time() - start_time
                 logger.warning(f"Gemini API timeout (attempt {attempt}) after {elapsed:.2f}s: {timeout_error}")
+                logger.exception("Timeout exception details:")
             except Exception as e:
                 elapsed = time.time() - start_time
                 logger.warning(f"Gemini generation failed (attempt {attempt}) after {elapsed:.2f}s: {e}")
+                logger.exception("Exception details for second attempt - NOW RAISING TO SURFACE ERROR:")
+                # CHANGED: Raise instead of falling back silently
+                raise
 
             # Fall back to mock provider
             return self._fallback_generate(topic, start_time)
@@ -150,9 +162,10 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
         except Exception as e:
             elapsed = time.time() - start_time
             logger.error(f"Unexpected error in generate_roadmap after {elapsed:.2f}s: {e}")
+            logger.exception("Full traceback:")
             raise ValueError(
                 f"Failed to generate roadmap for '{topic}'. "
-                "Please try again or contact support."
+                "Error: {e}"
             ) from e
 
     def _fallback_generate(self, topic: str, start_time: float) -> GeneratedRoadmap:
@@ -201,13 +214,18 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
             TimeoutError: If API call exceeds timeout
             Exception: If Gemini API call fails or returns invalid JSON
         """
-        logger.debug(f"Building prompt for topic: '{topic}'")
+        logger.warning(f"=== _generate_with_gemini() called for topic: {topic} ===")
+        logger.warning(f"Building prompt for topic: '{topic}'")
         prompt = self._build_prompt(topic)
 
         # Call Gemini API with timeout protection
         try:
-            logger.debug(f"Calling Gemini API with {GEMINI_TIMEOUT_SECONDS}s timeout")
+            logger.warning(f"Calling Gemini API with {GEMINI_TIMEOUT_SECONDS}s timeout")
             call_start = time.time()
+            
+            logger.warning(f"Model object: {self.model}")
+            logger.warning(f"Model name: {self.MODEL_NAME}")
+            logger.warning("GEMINI API CALL START")
             
             # Note: google-generativeai SDK doesn't support direct timeout parameter,
             # but we track elapsed time and raise TimeoutError if it exceeds threshold
@@ -220,33 +238,41 @@ class GeminiRoadmapProvider(BaseRoadmapProvider):
                 )
             )
             
+            logger.warning("GEMINI API CALL SUCCESS")
             call_elapsed = time.time() - call_start
-            logger.debug(f"Gemini API call completed in {call_elapsed:.2f}s")
+            logger.warning(f"Gemini API call completed in {call_elapsed:.2f}s")
+            logger.warning(f"Response received: {type(response)}")
             
             if call_elapsed > GEMINI_TIMEOUT_SECONDS:
                 logger.warning(f"Gemini API call took {call_elapsed:.2f}s (exceeds {GEMINI_TIMEOUT_SECONDS}s timeout)")
                 raise TimeoutError(f"Gemini API response time exceeded {GEMINI_TIMEOUT_SECONDS}s")
             
             response_text = response.text
+            logger.warning(f"Response text type: {type(response_text)}")
+            logger.warning(f"Response text length: {len(response_text) if response_text else 0}")
+            logger.warning(f"RAW GEMINI RESPONSE (first 1000 chars):")
+            logger.warning(response_text[:1000] if response_text else "EMPTY RESPONSE")
             
             if not response_text:
                 logger.error("Gemini returned empty response")
                 raise ValueError("Gemini API returned empty response")
             
-            logger.debug(f"Received response from Gemini ({len(response_text)} chars)")
+            logger.warning(f"Received response from Gemini ({len(response_text)} chars)")
             
             # Extract and parse JSON
-            logger.debug("Extracting JSON from response")
+            logger.warning("Extracting JSON from response")
             roadmap_data = self._extract_json(response_text)
+            logger.warning(f"Extracted JSON: {roadmap_data}")
             
-            logger.debug("Parsing roadmap structure")
+            logger.warning("Parsing roadmap structure")
             roadmap = self._parse_roadmap(roadmap_data, topic)
 
-            logger.info(f"Successfully generated roadmap for '{topic}' using Gemini")
+            logger.warning(f"✓ Successfully generated roadmap for '{topic}' using Gemini")
             return roadmap
             
         except Exception as e:
             logger.error(f"Error in _generate_with_gemini: {type(e).__name__}: {e}")
+            logger.exception(f"Full traceback for Gemini error:")
             raise
 
     def _build_prompt(self, topic: str) -> str:

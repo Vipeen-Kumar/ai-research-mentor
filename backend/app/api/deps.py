@@ -30,7 +30,12 @@ def get_ai_provider() -> BaseRoadmapProvider:
     Returns GeminiRoadmapProvider if AI_PROVIDER=gemini and API key is set.
     Otherwise returns MockRoadmapProvider as fallback.
     """
+    logger.warning(f"=== get_ai_provider() called ===")
+    logger.warning(f"AI_PROVIDER={settings.ai_provider}")
+    logger.warning(f"GEMINI_API_KEY starts with: {settings.gemini_api_key[:20] if settings.gemini_api_key else 'NOT SET'}")
+    
     if settings.ai_provider.lower() == "gemini":
+        logger.warning(f"AI_PROVIDER is 'gemini', checking API key...")
         if not settings.gemini_api_key:
             logger.warning(
                 "Gemini provider requested but GEMINI_API_KEY not set. "
@@ -39,13 +44,18 @@ def get_ai_provider() -> BaseRoadmapProvider:
             return MockRoadmapProvider()
         
         try:
-            logger.debug("Instantiating Gemini provider")
-            return GeminiRoadmapProvider(api_key=settings.gemini_api_key)
+            logger.warning("Instantiating Gemini provider...")
+            provider = GeminiRoadmapProvider(api_key=settings.gemini_api_key)
+            logger.warning("✓ Gemini provider instantiated successfully")
+            return provider
         except ValueError as e:
             logger.error(f"Failed to instantiate Gemini provider: {e}. Using mock provider.")
             return MockRoadmapProvider()
+        except Exception as e:
+            logger.error(f"Unexpected error instantiating Gemini provider: {type(e).__name__}: {e}")
+            return MockRoadmapProvider()
     
-    logger.debug("Using mock provider")
+    logger.warning("AI_PROVIDER is not 'gemini', using mock provider")
     return MockRoadmapProvider()
 
 

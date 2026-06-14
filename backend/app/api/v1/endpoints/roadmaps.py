@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+import logging
 
-from app.api.deps import get_db_session, get_roadmap_service
+from app.api.deps import get_db_session, get_roadmap_service, get_ai_provider
 from app.schemas.roadmap import (
     RoadmapGenerateRequest,
     RoadmapGenerateResponse,
@@ -9,9 +10,39 @@ from app.schemas.roadmap import (
     RoadmapDetailResponse,
 )
 from app.services.roadmap_service import RoadmapService
+from app.services.ai.base_provider import BaseRoadmapProvider
+from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+@router.get(
+    "/debug/provider",
+    status_code=status.HTTP_200_OK,
+    summary="Debug: Get current AI provider configuration",
+    description="Returns which AI provider is currently active and its configuration.",
+)
+def debug_get_provider(
+    provider: BaseRoadmapProvider = Depends(get_ai_provider),
+) -> dict:
+    """Debug endpoint to verify which provider is active."""
+    logger.warning(f"=== /debug/provider endpoint called ===")
+    logger.warning(f"Provider type: {type(provider).__name__}")
+    logger.warning(f"Provider name: {provider.provider_name}")
+    
+    from app.core.config import settings
+    
+    return {
+        "provider": provider.provider_name,
+        "provider_class": provider.__class__.__name__,
+        "api_provider_setting": settings.ai_provider,
+        "gemini_configured": settings.ai_provider.lower() == "gemini",
+        "api_key_loaded": bool(settings.gemini_api_key),
+        "api_key_first_20": settings.gemini_api_key[:20] if settings.gemini_api_key else None,
+        "is_gemini_provider": provider.__class__.__name__ == "GeminiRoadmapProvider",
+    }
 
 
 @router.post(
@@ -29,6 +60,8 @@ def generate_roadmap(
     db: Session = Depends(get_db_session),
     roadmap_service: RoadmapService = Depends(get_roadmap_service),
 ) -> RoadmapGenerateResponse:
+    logger.warning(f"=== /roadmaps/generate endpoint called ===")
+    logger.warning(f"Topic: {payload.topic}")
     return roadmap_service.generate(db=db, topic=payload.topic)
 
 

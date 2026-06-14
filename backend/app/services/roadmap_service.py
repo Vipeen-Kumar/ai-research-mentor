@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+import logging
 
 from app.repositories.roadmap_repository import RoadmapRepository
 from app.schemas.roadmap import (
@@ -10,6 +11,8 @@ from app.schemas.roadmap import (
 )
 from app.services.ai.base_provider import BaseRoadmapProvider
 
+logger = logging.getLogger(__name__)
+
 
 class RoadmapService:
     def __init__(
@@ -19,9 +22,15 @@ class RoadmapService:
     ) -> None:
         self.repository = repository
         self.provider = provider
+        logger.warning(f"=== RoadmapService initialized ===")
+        logger.warning(f"Provider: {provider.provider_name}")
+        logger.warning(f"Provider class: {provider.__class__.__name__}")
 
     def generate(self, db: Session, topic: str) -> RoadmapGenerateResponse:
         normalized_topic = topic.strip()
+        logger.warning(f"=== RoadmapService.generate() called ===")
+        logger.warning(f"Topic: {normalized_topic}")
+        logger.warning(f"Using provider: {self.provider.provider_name} ({self.provider.__class__.__name__})")
         generated_roadmap = self.provider.generate_roadmap(normalized_topic)
         topic_record = self.repository.get_or_create_topic(db, generated_roadmap.topic)
         roadmap = self.repository.create_roadmap(
